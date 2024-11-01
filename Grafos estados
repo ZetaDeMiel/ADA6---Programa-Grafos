@@ -1,0 +1,49 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+
+estados = ["Estado1", "Estado2", "Estado3", "Estado4", "Estado5", "Estado6", "Estado7"]
+relaciones = {
+    ("Estado1", "Estado2"): 10,
+    ("Estado2", "Estado3"): 15,
+    ("Estado3", "Estado4"): 10,
+    ("Estado4", "Estado5"): 20,
+    ("Estado5", "Estado6"): 25,
+    ("Estado6", "Estado7"): 30,
+    ("Estado7", "Estado1"): 35,
+    ("Estado2", "Estado5"): 18,
+    ("Estado3", "Estado6"): 22,
+    ("Estado1", "Estado4"): 27
+}
+
+G = nx.Graph()
+for estado in estados:
+    G.add_node(estado)
+for (estado1, estado2), costo in relaciones.items():
+    G.add_edge(estado1, estado2, weight=costo)
+
+def calcular_costo(recorrido):
+    costo_total = 0
+    for i in range(len(recorrido) - 1):
+        if G.has_edge(recorrido[i], recorrido[i + 1]):
+            costo_total += G[recorrido[i]][recorrido[i + 1]]['weight']
+    return costo_total
+
+recorrido_a = estados
+costo_a = calcular_costo(recorrido_a)
+
+recorrido_b = ["Estado1", "Estado2", "Estado3", "Estado4", "Estado5", "Estado6", "Estado7", "Estado2"]
+costo_b = calcular_costo(recorrido_b)
+
+print("Recorrido sin repetir:", " -> ".join(recorrido_a))
+print("Costo total (sin repetir):", costo_a)
+
+print("\nRecorrido con repetición:", " -> ".join(recorrido_b))
+print("Costo total (con repetición):", costo_b)
+
+pos = nx.spring_layout(G)
+plt.figure(figsize=(10, 7))
+nx.draw(G, pos, with_labels=True, node_color='skyblue', node_size=2000, font_size=10, font_weight='bold')
+labels = nx.get_edge_attributes(G, 'weight')
+nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+plt.title("Mapa de estados con costos de traslado")
+plt.show()
